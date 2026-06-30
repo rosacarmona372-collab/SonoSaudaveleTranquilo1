@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaquinha Sono Tranquilo</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #0e1520;
+  --deep:      #141c2e;
+  --card:      #1a2438;
+  --rim:       #243048;
+  --moon:      #f2efe8;
+  --star:      #c8d4e8;
+  --muted:     #7a90b0;
+  --blue:      #5b8fd4;
+  --bluesoft:  rgba(91,143,212,0.15);
+  --gold:      #d4a84b;
+  --goldsoft:  rgba(212,168,75,0.12);
+  --green:     #4db88a;
+  --greensoft: rgba(77,184,138,0.12);
+  --red:       #e05c5c;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--moon);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── SKY ── */
+.sky {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, #1a2a4a 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 10%, #0f1e38 0%, transparent 55%),
+    var(--ink);
+}
+.sky::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.2px 1.2px at  8% 12%, rgba(255,255,255,.55) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 20% 28%, rgba(255,255,255,.35) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 33%  6%, rgba(255,255,255,.65) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 47% 18%, rgba(255,255,255,.40) 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 62%  9%, rgba(255,255,255,.50) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 74% 22%, rgba(255,255,255,.30) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 88%  5%, rgba(255,255,255,.60) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 95% 30%, rgba(255,255,255,.35) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 12% 55%, rgba(255,255,255,.25) 0%,transparent 100%),
+    radial-gradient(1.2px 1.2px at 55% 48%, rgba(255,255,255,.40) 0%,transparent 100%),
+    radial-gradient(1px   1px   at 80% 60%, rgba(255,255,255,.30) 0%,transparent 100%);
+}
+
+/* ── LAYOUT ── */
+.wrap { max-width: 660px; margin: 0 auto; padding: 0 22px; position: relative; z-index: 1; }
+section { padding: 64px 0; }
+.divider { height: 1px; background: var(--rim); position: relative; z-index: 1; }
+
+/* ══════════════════════════════
+   QUIZ
+══════════════════════════════ */
+#quiz-shell {
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 22px;
+}
+
+.quiz-logo {
+  font-family: 'Lora', serif;
+  font-size: 15px; font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 48px;
+  text-align: center;
+}
+.quiz-logo span { color: var(--gold); }
+
+/* progress */
+.progress-bar {
+  width: 100%; max-width: 420px;
+  height: 3px; background: var(--rim);
+  border-radius: 2px; margin-bottom: 48px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* steps */
+.quiz-step {
+  width: 100%; max-width: 420px;
+  display: none; flex-direction: column; align-items: center; text-align: center;
+  animation: fadeUp 0.35s ease;
+}
+.quiz-step.active { display: flex; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-emoji { font-size: 42px; margin-bottom: 16px; display: block; }
+
+.quiz-q {
+  font-family: 'Lora', serif;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 700;
+  color: var(--moon);
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+.quiz-sub {
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 32px; line-height: 1.6;
+}
+
+/* name input */
+.name-input {
+  width: 100%;
+  background: var(--card);
+  border: 1.5px solid var(--rim);
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 17px; font-family: 'DM Sans', sans-serif;
+  color: var(--moon);
+  outline: none;
+  transition: border-color 0.2s;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.name-input::placeholder { color: var(--muted); }
+.name-input:focus { border-color: var(--blue); }
+
+/* option buttons */
+.quiz-options { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.opt {
+  width: 100%;
+  background: var(--card);
+  border: 1.5px solid var(--rim);
+  border-radius: 14px;
+  padding: 15px 20px;
+  font-size: 15px; font-family: 'DM Sans', sans-serif;
+  color: var(--moon);
+  cursor: pointer;
+  text-align: left;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.18s, background 0.18s, transform 0.1s;
+}
+.opt:hover { border-color: var(--blue); background: var(--bluesoft); transform: translateY(-1px); }
+.opt.selected { border-color: var(--gold); background: var(--goldsoft); color: var(--gold); }
+.opt-icon { font-size: 20px; flex-shrink: 0; }
+.opt-text { font-size: 15px; }
+
+/* next btn */
+.btn-next {
+  margin-top: 20px;
+  width: 100%;
+  background: linear-gradient(135deg, #5b8fd4 0%, #3a6db8 100%);
+  color: #fff;
+  border: none; border-radius: 14px;
+  padding: 16px 24px;
+  font-size: 16px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  box-shadow: 0 4px 20px rgba(91,143,212,0.3);
+  opacity: 0.4; pointer-events: none;
+}
+.btn-next.ready { opacity: 1; pointer-events: auto; }
+.btn-next.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(91,143,212,0.4); }
+
+/* ── ANÁLISE ── */
+#analysis-screen {
+  display: none;
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 22px; text-align: center;
+}
+.analysis-moon { font-size: 60px; margin-bottom: 24px; animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:.8} }
+
+.analysis-title {
+  font-family: 'Lora', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--moon); margin-bottom: 10px;
+}
+.analysis-sub { font-size: 14px; color: var(--muted); margin-bottom: 36px; }
+
+.analysis-lines { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+.aline {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; color: var(--muted);
+  opacity: 0; transform: translateX(-10px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.aline.show { opacity: 1; transform: translateX(0); }
+.aline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+.aline-dot.done { background: var(--green); }
+
+/* ── RESULTADO ── */
+#result-screen {
+  display: none;
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 22px; text-align: center; max-width: 500px; margin: 0 auto;
+}
+.result-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--greensoft); border: 1px solid rgba(77,184,138,0.25);
+  border-radius: 100px; padding: 6px 16px;
+  font-size: 12px; font-weight: 600; color: var(--green);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.result-name {
+  font-family: 'Lora', serif;
+  font-size: clamp(22px,4vw,30px); font-weight: 700;
+  color: var(--moon); line-height: 1.3; margin-bottom: 20px;
+}
+.result-name span { color: var(--gold); }
+.result-box {
+  background: var(--card); border: 1px solid var(--rim);
+  border-radius: 18px; padding: 24px 26px;
+  margin-bottom: 28px; text-align: left;
+}
+.result-box-label {
+  font-size: 11px; font-weight: 600; color: var(--blue);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+}
+.result-box-text { font-size: 15px; color: var(--star); line-height: 1.7; }
+.result-box-text strong { color: var(--moon); }
+
+.btn-see {
+  display: block; width: 100%;
+  background: linear-gradient(135deg, #d4a84b 0%, #b8872a 100%);
+  color: var(--ink);
+  font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  padding: 18px 24px; border-radius: 14px; border: none; cursor: pointer;
+  text-decoration: none; text-align: center;
+  box-shadow: 0 4px 24px rgba(212,168,75,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.01em;
+}
+.btn-see:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(212,168,75,0.45); }
+
+/* ══════════════════════════════
+   LANDING PAGE
+══════════════════════════════ */
+#landing { display: none; }
+
+/* ── HERO ── */
+.hero { padding: 80px 0 56px; text-align: center; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bluesoft); border: 1px solid rgba(91,143,212,0.25);
+  border-radius: 100px; padding: 6px 16px;
+  font-size: 13px; color: var(--blue); letter-spacing: 0.03em;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-family: 'Lora', serif;
+  font-size: clamp(26px, 5vw, 44px); font-weight: 700;
+  line-height: 1.25; color: var(--moon);
+  margin-bottom: 10px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+
+.hero-name-hl {
+  font-family: 'Lora', serif;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: var(--blue); font-weight: 500; font-style: italic;
+  margin-bottom: 20px; display: block;
+}
+
+.hero-sub {
+  font-size: 16px; color: var(--muted); line-height: 1.75;
+  max-width: 500px; margin: 0 auto 32px;
+}
+
+.faces-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-bottom: 36px; font-size: 14px; color: var(--muted);
+}
+.faces { display: flex; }
+.face {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  margin-left: -7px;
+}
+.face:first-child { margin-left: 0; }
+
+.urgency-bar {
+  background: var(--goldsoft); border: 1px solid rgba(212,168,75,0.22);
+  border-radius: 12px; padding: 12px 18px;
+  font-size: 14px; color: var(--gold); text-align: center;
+  margin-bottom: 28px;
+}
+.urgency-bar strong { color: var(--moon); }
+
+/* ── CTA ── */
+.cta-btn {
+  display: block; width: 100%;
+  background: linear-gradient(135deg, #5b8fd4 0%, #3a6db8 100%);
+  color: #fff; font-size: 17px; font-weight: 600;
+  padding: 18px 28px; border-radius: 14px;
+  border: none; cursor: pointer; text-decoration: none; text-align: center;
+  box-shadow: 0 4px 24px rgba(91,143,212,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(91,143,212,0.45); }
+
+.cta-trust {
+  display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+  font-size: 12px; color: var(--muted); margin-top: 12px;
+}
+.cta-trust span { display: flex; align-items: center; gap: 4px; }
+
+/* ── SECTIONS ── */
+.sec-label {
+  font-size: 11px; font-weight: 600; color: var(--blue);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+}
+.sec-title {
+  font-family: 'Lora', serif;
+  font-size: clamp(20px,3.5vw,30px); font-weight: 700;
+  color: var(--moon); line-height: 1.35; margin-bottom: 14px;
+}
+.sec-desc { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 32px; }
+
+/* ── DOR ── */
+.pain-card {
+  background: var(--card); border-radius: 18px; padding: 32px;
+  border: 1px solid var(--rim);
+}
+.pain-title {
+  font-family: 'Lora', serif;
+  font-size: 20px; font-weight: 700; color: var(--moon);
+  margin-bottom: 20px; line-height: 1.35;
+}
+.pain-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.pain-list li {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 15px; color: var(--muted); line-height: 1.6;
+}
+.pain-list li::before { content: '😔'; font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.pain-end {
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--rim);
+  font-size: 15px; color: var(--gold); font-style: italic; line-height: 1.65;
+}
+
+/* ── BENEFÍCIOS ── */
+.benefits { display: flex; flex-direction: column; gap: 12px; }
+.benefit {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card); border-radius: 14px; padding: 16px 18px;
+  border: 1px solid var(--rim);
+  transition: border-color 0.2s;
+}
+.benefit:hover { border-color: var(--blue); }
+.benefit-icon { font-size: 22px; flex-shrink: 0; }
+.benefit-title { font-size: 15px; font-weight: 600; color: var(--moon); margin-bottom: 3px; }
+.benefit-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── INCLUI ── */
+.inside { display: flex; flex-direction: column; gap: 10px; }
+.inside-item {
+  display: flex; gap: 14px; align-items: center;
+  background: var(--card); border-radius: 12px; padding: 14px 18px;
+  border-left: 3px solid var(--blue);
+}
+.inside-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bluesoft); color: var(--blue);
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.inside-text { font-size: 14px; color: var(--star); }
+.inside-text strong { color: var(--moon); }
+
+/* ── PARA QUEM ── */
+.forwho { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 480px) { .forwho { grid-template-columns: 1fr; } }
+.fw {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 13px 15px; border-radius: 12px; font-size: 14px; line-height: 1.5;
+}
+.fw.yes { background: var(--greensoft); border: 1px solid rgba(77,184,138,0.2); color: var(--moon); }
+.fw.no  { background: rgba(224,92,92,0.07); border: 1px solid rgba(224,92,92,0.15); color: var(--muted); }
+
+/* ── DEPOIMENTOS — CARROSSEL WHATSAPP ── */
+.testi-carousel-wrap { position: relative; }
+.testi-carousel {
+  display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: 6px; scrollbar-width: none; -ms-overflow-style: none;
+}
+.testi-carousel::-webkit-scrollbar { display: none; }
+.testi-card {
+  scroll-snap-align: start; flex: 0 0 86%; max-width: 340px;
+  background: #0b141a; border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--rim);
+}
+@media (min-width: 540px) { .testi-card { flex: 0 0 320px; } }
+
+.wa-header {
+  background: #202c33; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.wa-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--bluesoft); display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.wa-name { font-size: 14px; font-weight: 600; color: #e9edef; }
+.wa-status { font-size: 11px; color: #8696a0; }
+
+.wa-body {
+  background: #0b141a; padding: 14px 14px 10px;
+  background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 18px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 320px; overflow-y: auto;
+}
+.wa-bubble {
+  background: #202c33; color: #e9edef;
+  font-size: 12.5px; line-height: 1.5;
+  border-radius: 8px; padding: 8px 10px;
+  max-width: 92%; position: relative;
+}
+.wa-bubble.out { background: #005c4b; align-self: flex-end; }
+.wa-time { font-size: 10px; color: #8696a0; text-align: right; margin-top: 3px; }
+
+.testi-result-tag {
+  display: block; text-align: center;
+  background: var(--greensoft); color: var(--green);
+  font-size: 11px; font-weight: 600; padding: 8px 10px;
+}
+
+.testi-nav {
+  display: flex; justify-content: center; gap: 6px; margin-top: 14px;
+}
+.testi-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--rim); transition: background 0.2s;
+}
+.testi-dot.active { background: var(--blue); width: 18px; border-radius: 4px; }
+
+.testi-swipe-hint {
+  font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px;
+}
+
+/* ── PREÇO ── */
+.price-card {
+  background: var(--card); border: 1px solid rgba(91,143,212,0.3);
+  border-radius: 20px; padding: 36px 30px; position: relative; overflow: hidden;
+}
+.price-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--gold));
+}
+.price-badge {
+  display: inline-block;
+  background: var(--goldsoft); border: 1px solid rgba(212,168,75,0.25);
+  color: var(--gold); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 14px; border-radius: 100px; margin-bottom: 16px;
+}
+.price-name {
+  font-family: 'Lora', serif;
+  font-size: 22px; font-weight: 700; color: var(--moon); margin-bottom: 6px;
+}
+.price-amount {
+  font-size: 50px; font-weight: 700; color: var(--moon); line-height: 1; margin-bottom: 6px;
+  font-family: 'DM Sans', sans-serif;
+}
+.price-amount sup { font-size: 20px; vertical-align: super; color: var(--muted); }
+.price-desc { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+.price-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.price-list li {
+  display: flex; gap: 10px; font-size: 14px; color: var(--star); align-items: flex-start;
+}
+.price-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+/* bump */
+.bump {
+  background: rgba(212,168,75,0.07); border: 1.5px dashed rgba(212,168,75,0.3);
+  border-radius: 14px; padding: 18px 20px; margin-bottom: 24px; cursor: pointer;
+}
+.bump-top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.bump-checkbox {
+  width: 20px; height: 20px; border-radius: 5px;
+  border: 2px solid var(--gold); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--gold); transition: background 0.15s;
+}
+.bump-label { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.07em; }
+.bump-title { font-size: 15px; font-weight: 600; color: var(--moon); margin-bottom: 5px; }
+.bump-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.bump-price { font-size: 14px; font-weight: 600; color: var(--gold); margin-top: 8px; }
+
+/* ── GARANTIA ── */
+.guarantee {
+  background: var(--greensoft); border: 1px solid rgba(77,184,138,0.22);
+  border-radius: 16px; padding: 26px 28px;
+  display: flex; gap: 18px; align-items: flex-start;
+}
+.guarantee-icon { font-size: 42px; flex-shrink: 0; }
+.guarantee-title {
+  font-family: 'Lora', serif;
+  font-size: 18px; font-weight: 700; color: var(--moon); margin-bottom: 8px;
+}
+.guarantee-text { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ── FAQ ── */
+.faq { display: flex; flex-direction: column; gap: 8px; }
+.faq-item {
+  background: var(--card); border-radius: 12px;
+  border: 1px solid var(--rim); overflow: hidden;
+}
+.faq-q {
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 15px; font-weight: 500; color: var(--moon);
+  font-family: 'DM Sans', sans-serif; gap: 12px; text-align: left;
+}
+.faq-arrow { color: var(--blue); font-size: 16px; transition: transform 0.2s; flex-shrink: 0; }
+.faq-a { font-size: 14px; color: var(--muted); line-height: 1.7; padding: 0 20px 16px; display: none; }
+.faq-item.open .faq-a { display: block; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+/* ── FOOTER CTA ── */
+.footer-cta { text-align: center; padding: 60px 0 80px; }
+.footer-cta h2 {
+  font-family: 'Lora', serif;
+  font-size: clamp(22px,4vw,34px); font-weight: 700;
+  color: var(--moon); margin-bottom: 12px; line-height: 1.3;
+}
+.footer-cta p { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+
+/* ── STICKY MOBILE ── */
+.sticky {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: var(--deep); border-top: 1px solid var(--rim);
+  padding: 12px 20px; box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+}
+@media (max-width: 600px) { .sticky { display: block; } }
+.sticky-inner { max-width: 500px; margin: 0 auto; }
+.sticky-label { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+
+@media (max-width: 600px) {
+  section { padding: 48px 0; }
+  .pain-card { padding: 24px 20px; }
+  .price-card { padding: 28px 22px; }
+  .guarantee { flex-direction: column; gap: 14px; }
+  body { padding-bottom: 80px; }
+}
+</style>
+</head>
+<body>
+
+<div class="sky"></div>
+
+<!-- ══════════════════════════════
+     QUIZ
+══════════════════════════════ -->
+<div id="quiz-shell">
+  <div class="quiz-logo">🌙 <span>Vaquinha Sono Tranquilo</span></div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+
+  <!-- Passo 1 — Nome -->
+  <div class="quiz-step active" id="step-1">
+    <span class="step-emoji">👋</span>
+    <h2 class="quiz-q">Olá! Qual é o teu nome?</h2>
+    <p class="quiz-sub">Para tornar esta experiência mais pessoal para ti e para o teu bebé.</p>
+    <input
+      type="text"
+      class="name-input"
+      id="name-input"
+      placeholder="Escreve o teu nome aqui..."
+      autocomplete="given-name"
+      inputmode="text"
+    />
+    <button class="btn-next" id="btn-1">Continuar →</button>
+  </div>
+
+  <!-- Passo 2 — Idade do bebé -->
+  <div class="quiz-step" id="step-2">
+    <span class="step-emoji">👶</span>
+    <h2 class="quiz-q">Quantos meses tem o teu bebé?</h2>
+    <p class="quiz-sub">O método tem uma abordagem específica para cada fase de desenvolvimento.</p>
+    <div class="quiz-options">
+      <button class="opt" data-q="2" data-v="2-4">
+        <span class="opt-icon">🌱</span>
+        <span class="opt-text">2 a 4 meses</span>
+      </button>
+      <button class="opt" data-q="2" data-v="4-8">
+        <span class="opt-icon">🌿</span>
+        <span class="opt-text">4 a 8 meses</span>
+      </button>
+      <button class="opt" data-q="2" data-v="8-18">
+        <span class="opt-icon">🌳</span>
+        <span class="opt-text">8 a 18 meses</span>
+      </button>
+    </div>
+    <button class="btn-next" id="btn-2">Continuar →</button>
+  </div>
+
+  <!-- Passo 3 — Como adormece -->
+  <div class="quiz-step" id="step-3">
+    <span class="step-emoji">😴</span>
+    <h2 class="quiz-q">Como é que o teu bebé adormece normalmente?</h2>
+    <p class="quiz-sub">Isto ajuda-nos a identificar o padrão exacto a resolver.</p>
+    <div class="quiz-options">
+      <button class="opt" data-q="3" data-v="peito">
+        <span class="opt-icon">🤱</span>
+        <span class="opt-text">Só adormece a mamar no peito</span>
+      </button>
+      <button class="opt" data-q="3" data-v="colo">
+        <span class="opt-icon">🤲</span>
+        <span class="opt-text">Precisa de ser embalado ao colo</span>
+      </button>
+      <button class="opt" data-q="3" data-v="choro">
+        <span class="opt-icon">😢</span>
+        <span class="opt-text">Chora muito antes de adormecer</span>
+      </button>
+      <button class="opt" data-q="3" data-v="misto">
+        <span class="opt-icon">🔀</span>
+        <span class="opt-text">Uma mistura de tudo isso</span>
+      </button>
+    </div>
+    <button class="btn-next" id="btn-3">Continuar →</button>
+  </div>
+
+  <!-- Passo 4 — Quantas vezes acorda -->
+  <div class="quiz-step" id="step-4">
+    <span class="step-emoji">🌛</span>
+    <h2 class="quiz-q">Quantas vezes o teu bebé acorda durante a noite?</h2>
+    <p class="quiz-sub">Sem julgamentos — a tua honestidade ajuda-nos a dar-te a solução certa.</p>
+    <div class="quiz-options">
+      <button class="opt" data-q="4" data-v="1-2">
+        <span class="opt-icon">😌</span>
+        <span class="opt-text">1 a 2 vezes — quase consigo dormir</span>
+      </button>
+      <button class="opt" data-q="4" data-v="3-4">
+        <span class="opt-icon">😩</span>
+        <span class="opt-text">3 a 4 vezes — estou muito cansada</span>
+      </button>
+      <button class="opt" data-q="4" data-v="5+">
+        <span class="opt-icon">😵</span>
+        <span class="opt-text">5 ou mais vezes — já não aguento</span>
+      </button>
+    </div>
+    <button class="btn-next" id="btn-4">Ver o meu resultado →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     ANÁLISE
+══════════════════════════════ -->
+<div id="analysis-screen">
+  <div class="analysis-moon">🌙</div>
+  <h2 class="analysis-title">A analisar o perfil do teu bebé…</h2>
+  <p class="analysis-sub">Só um momento, <span id="analysis-name"></span></p>
+  <div class="analysis-lines">
+    <div class="aline" id="al-1"><div class="aline-dot"></div><span>A identificar o padrão de sono…</span></div>
+    <div class="aline" id="al-2"><div class="aline-dot"></div><span>A calcular a abordagem ideal…</span></div>
+    <div class="aline" id="al-3"><div class="aline-dot"></div><span>A preparar o teu plano personalizado…</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RESULTADO
+══════════════════════════════ -->
+<div id="result-screen">
+  <div class="result-badge">✓ Análise concluída</div>
+  <h2 class="result-name">
+    <span id="result-name-display"></span>, encontrámos<br>a solução para o teu bebé
+  </h2>
+  <div class="result-box">
+    <div class="result-box-label">O teu perfil</div>
+    <p class="result-box-text" id="result-text"></p>
+  </div>
+  <button class="btn-see" id="btn-see-method">
+    Ver o método que resolve isto →
+  </button>
+</div>
+
+<!-- ══════════════════════════════
+     LANDING PAGE
+══════════════════════════════ -->
+<div id="landing">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-badge">🌙 Método Vaquinha Sono Tranquilo</div>
+
+      <p class="hero-name-hl" id="lp-name-greeting"></p>
+
+      <h1 id="lp-headline">
+        O teu bebé ainda acorda<br>a chorar de madrugada?
+        <em>Isso tem solução.</em>
+      </h1>
+
+      <p class="hero-sub">
+        O método gentil, sem choro e sem medicação que já ajudou mais de 2.500 mães angolanas a ter noites tranquilas — e que começa a funcionar ainda esta semana.
+      </p>
+
+      <div class="faces-row">
+        <div class="faces">
+          <div class="face">👩🏿</div>
+          <div class="face">👩🏾</div>
+          <div class="face">👩🏽</div>
+          <div class="face">👩🏿</div>
+        </div>
+        <span>+2.500 mães angolanas já aplicaram</span>
+      </div>
+
+      <div class="urgency-bar">
+        🎁 <strong>Esta semana:</strong> Kit Noite Tranquila incluído grátis na tua compra
+      </div>
+
+      <a href="https://culonga.com/checkout/c5a571e6-1be6-4d9f-a18a-2f567ae23d0a" class="cta-btn">Quero noites tranquilas agora — 7.500 Kz</a>
+      <div class="cta-trust">
+        <span>🔒 Pagamento seguro</span>
+        <span>⚡ Acesso imediato</span>
+        <span>💰 Garantia de 7 dias</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DOR -->
+  <section>
+    <div class="wrap">
+      <div class="pain-card">
+        <p class="pain-title">Reconheces isto?</p>
+        <ul class="pain-list">
+          <li>O teu bebé só adormece a mamar — e acorda assim que o pousos</li>
+          <li>Levantas-te 4, 5, 6 vezes por noite e já não aguentas</li>
+          <li>Estás tão cansada que deixaste de ser a mãe que queres ser durante o dia</li>
+          <li>Já tentaste de tudo: embalar, cantar, passear de carro — nada resulta</li>
+          <li>A tensão em casa está a crescer porque ninguém descansa</li>
+        </ul>
+        <p class="pain-end">
+          "Pensava que era normal. Que eu é que estava a fazer algo errado. Que ia ser assim para sempre." — não tens de sentir isto mais.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SOLUÇÃO -->
+  <section>
+    <div class="wrap">
+      <p class="sec-label">A solução</p>
+      <h2 class="sec-title">Um método gentil, passo a passo, que respeita o teu bebé — e a ti</h2>
+      <p class="sec-desc">Criado em português de Angola, para bebés a partir dos 2 meses. Sem choro controlado, sem medicação, sem deixar o bebé sozinho.</p>
+      <div class="benefits">
+        <div class="benefit">
+          <div class="benefit-icon">🌙</div>
+          <div>
+            <div class="benefit-title">Adormece sozinho sem mamar</div>
+            <div class="benefit-desc">Aprendes a criar uma rotina que o bebé associa à segurança — não ao peito.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">😴</div>
+          <div>
+            <div class="benefit-title">Dorme mais horas seguidas</div>
+            <div class="benefit-desc">A maioria das mães vê melhorias logo na primeira semana de aplicação.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">💚</div>
+          <div>
+            <div class="benefit-title">Sem choro, sem stress, sem culpa</div>
+            <div class="benefit-desc">Respeita o vínculo entre mãe e bebé. Não precisas de deixá-lo chorar sozinho.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">📱</div>
+          <div>
+            <div class="benefit-title">Acesso imediato no telemóvel</div>
+            <div class="benefit-desc">Assim que compras, recebes tudo. Podes começar esta mesma noite.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- O QUE INCLUI -->
+  <section>
+    <div class="wrap">
+      <p class="sec-label">O que recebes</p>
+      <h2 class="sec-title">Tudo o que precisas para começar hoje à noite</h2>
+      <div class="inside">
+        <div class="inside-item">
+          <div class="inside-num">1</div>
+          <div class="inside-text"><strong>Guia Completo Vaquinha Sono Tranquilo</strong> — método passo a passo adaptado à idade do teu bebé</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-num">2</div>
+          <div class="inside-text"><strong>Rotina de Sono Personalizada</strong> — checklist diária com horários e sinais de cansaço a reconhecer</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-num">3</div>
+          <div class="inside-text"><strong>Guia do Ambiente Ideal</strong> — como preparar o quarto, temperatura, luz e sons</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-num">🎁</div>
+          <div class="inside-text"><strong>BÓNUS — Kit Noite Tranquila</strong> — playlist de sons brancos + rotina de banho e massagem relaxante (grátis esta semana)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PARA QUEM -->
+  <section>
+    <div class="wrap">
+      <p class="sec-label">Para quem é</p>
+      <h2 class="sec-title">Este método é para ti se…</h2>
+      <div class="forwho">
+        <div class="fw yes">✅&nbsp; O teu bebé tem entre 2 e 18 meses</div>
+        <div class="fw yes">✅&nbsp; Estás exausta de noites sem dormir</div>
+        <div class="fw yes">✅&nbsp; O bebé só adormece ao colo ou a mamar</div>
+        <div class="fw yes">✅&nbsp; Queres uma solução gentil, sem choro</div>
+        <div class="fw no">❌&nbsp; Bebés recém-nascidos com menos de 2 meses</div>
+        <div class="fw no">❌&nbsp; Quem procura resultados sem consistência</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DEPOIMENTOS — CARROSSEL WHATSAPP -->
+  <section>
+    <div class="wrap">
+      <p class="sec-label">O que as mães dizem</p>
+      <h2 class="sec-title">Mensagens reais de mães que já usaram o método</h2>
+      <p class="sec-desc">Estes são prints reais de conversas no WhatsApp com mães angolanas que aplicaram o método Sono Tranquilo.</p>
+
+      <div class="testi-carousel-wrap">
+        <div class="testi-carousel" id="testi-carousel">
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏽</div>
+              <div><div class="wa-name">Joana Cardoso</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Sou mãe de primeira viagem e os primeiros meses foram muito difíceis... O meu bebé não dormia de noite, acordava de 1h em 1h e eu já estava a ficar sem forças, a chorar todos os dias de cansaço. 😩 Foi então que uma amiga me falou do Sono Tranquilo.<div class="wa-time">09:10</div></div>
+              <div class="wa-bubble">Gente, foi a melhor decisão que tomei! 🙌💖 Na primeira semana já vi diferença, e hoje o meu bebé dorme a noite inteirinha! Voltei a ter energia, voltei a ser eu, voltei a sorrir!<div class="wa-time">09:12</div></div>
+              <div class="wa-bubble out">Que testemunho lindo! Saber que fez tanta diferença é o nosso maior propósito! 🙏💛<div class="wa-time">09:16</div></div>
+            </div>
+            <span class="testi-result-tag">✓ Bebé dorme a noite inteira na 1ª semana</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏿</div>
+              <div><div class="wa-name">Tersa Guimarães</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Eu já não aguentava mais! O meu bebé acordava de hora em hora, chorava muito e eu também vivia como uma zombi, sem forças, sem paciência. Já tinha usado de tudo: chá, remédio, dicas da sogra... nada resolvia de verdade.<div class="wa-time">08:30</div></div>
+              <div class="wa-bubble">Nos primeiros dias já vi diferença! Mas na primeira semana o meu filho dormiu a noite toda pela primeira vez... eu chorei de alegria! 😭💖 Hoje ele dorme melhor, acorda feliz e eu voltei a sorrir.<div class="wa-time">08:32</div></div>
+              <div class="wa-bubble out">Que testemunho lindo e emocionante! Deus te abençoe sempre! 🙏💛<div class="wa-time">08:35</div></div>
+            </div>
+            <span class="testi-result-tag">✓ Dormiu a noite toda na 1ª semana</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏾</div>
+              <div><div class="wa-name">Arieth Cambinda</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Antes sofria muito pra o meu bebé dormir, parecia impossível. Ele acordava muitas vezes, chorava sem parar e eu já não sabia mais o que fazer.<div class="wa-time">09:12</div></div>
+              <div class="wa-bubble">Desde que comecei a usar o Sono Tranquilo, tudo mudou! O meu bebé agora dorme melhor, acorda mais calmo e até eu consigo descansar. Sinto que recuperamos a nossa paz cá em casa 💖<div class="wa-time">09:14</div></div>
+              <div class="wa-bubble out">Que testemunho lindo! Fico muito feliz em saber que fez tanta diferença. 🙌💛<div class="wa-time">09:16</div></div>
+              <div class="wa-bubble">Recomendo de coração pra todas as mães 🥰<div class="wa-time">09:18</div></div>
+            </div>
+            <span class="testi-result-tag">✓ Recuperou a paz em casa</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏿</div>
+              <div><div class="wa-name">Celeste da Piedade</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Antes o meu bebé acordava muitas vezes durante a noite e eu ficava mesmo cansada, parecia que não tinha fim. Desde que comecei a usar, ele dorme melhor, acorda mais calminho e eu também já consigo descansar. Foi a melhor decisão que tomei! 💕<div class="wa-time">08:00</div></div>
+              <div class="wa-bubble">Muito obrigada por criarem algo que realmente ajuda nós, mães. Que Deus continue a vos abençoar! 🙌<div class="wa-time">08:01</div></div>
+              <div class="wa-bubble out">Que alegria ler isso! Fico muito feliz que esteja a fazer a diferença. Conte sempre connosco! 💛<div class="wa-time">08:03</div></div>
+            </div>
+            <span class="testi-result-tag">✓ "A melhor decisão que tomei"</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏻</div>
+              <div><div class="wa-name">Ana Paula</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Meu bebê sempre teve muita dificuldade pra dormir, acordava várias vezes durante a noite e isso estava me deixando esgotada. Já tinha tentado de tudo...<div class="wa-time">08:47</div></div>
+              <div class="wa-bubble">Mudou TUDO! Com o Sono Tranquilo, em poucos dias já vi diferença, e hoje ele dorme super tranquilo e eu também consegui descansar melhor.<div class="wa-time">08:53</div></div>
+              <div class="wa-bubble">O método é simples, prático e realmente funciona! Me arrependo de não ter conhecido antes. Indico de olhos fechados pra todas as mamães cansadas como eu estava.<div class="wa-time">08:55</div></div>
+              <div class="wa-bubble out">Muito obrigada por confiar e compartilhar! Isso ajuda muitas outras mães 💛<div class="wa-time">08:58</div></div>
+            </div>
+            <span class="testi-result-tag">✓ Diferença em poucos dias</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏾</div>
+              <div><div class="wa-name">Alexandra Tavares</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Vim para contar que o Sono Tranquilo fez um autêntico milagre aqui em casa. Antes a minha fofura acordava de hora a hora, eu estava em ponto de rebuçado, já não aguentava.<div class="wa-time">09:30</div></div>
+              <div class="wa-bubble">Maman, agora o menino dorme quatro horas seguidas e nós também! Nem imaginas a felicidade. O Sono Tranquilo foi a melhor compra da minha vida! 🙌❤️<div class="wa-time">09:42</div></div>
+              <div class="wa-bubble out">Que alegria ouvir isso! É para isso que trabalhamos, para devolver a paz às famílias 🥰<div class="wa-time">09:45</div></div>
+            </div>
+            <span class="testi-result-tag">✓ 4 horas seguidas de sono</span>
+          </div>
+
+          <div class="testi-card">
+            <div class="wa-header">
+              <div class="wa-avatar">👩🏼</div>
+              <div><div class="wa-name">Lourdes Contreiras</div><div class="wa-status">online</div></div>
+            </div>
+            <div class="wa-body">
+              <div class="wa-bubble">Não sei nem como começar... tenho lágrimas nos olhos enquanto escrevo. Passámos meses a fio sem saber o que era dormir, sentindo-me a pior mãe do mundo.<div class="wa-time">08:30</div></div>
+              <div class="wa-bubble">Em duas semanas, o cenário mudou. Pela primeira vez em meses, vi o sorriso dele quando acordou, não um choro. O alívio é indescritível. 😍🙌<div class="wa-time">08:35</div></div>
+              <div class="wa-bubble out">Que relato incrível e tocante. Fico imensamente feliz que pudemos ajudar a restaurar a paz na sua casa ❤️<div class="wa-time">08:37</div></div>
+              <div class="wa-bubble">Vocês não fazem ideia do que isso significa para mim. É um divisor de águas! 🙌🔥<div class="wa-time">08:40</div></div>
+            </div>
+            <span class="testi-result-tag">✓ Mudança em 2 semanas</span>
+          </div>
+
+        </div>
+
+        <div class="testi-nav" id="testi-nav"></div>
+        <p class="testi-swipe-hint">← deslize para ver mais testemunhos →</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PREÇO -->
+  <section id="comprar">
+    <div class="wrap">
+      <p class="sec-label">Começa hoje</p>
+      <h2 class="sec-title">Investe numa noite tranquila</h2>
+      <div class="price-card">
+        <div class="price-badge">Oferta completa</div>
+        <div class="price-name">Método Vaquinha Sono Tranquilo</div>
+        <div class="price-amount">7.500 <sup>Kz</sup></div>
+        <div class="price-desc">Acesso imediato a todo o conteúdo + bónus grátis</div>
+        <ul class="price-list">
+          <li>Guia Completo do Método (PDF)</li>
+          <li>Rotina de Sono Personalizada por faixa etária</li>
+          <li>Guia do Ambiente Ideal para o Quarto</li>
+          <li>🎁 Kit Noite Tranquila — bónus grátis desta semana</li>
+          <li>Acesso imediato no telemóvel ou computador</li>
+        </ul>
+
+        <!-- ORDER BUMP -->
+        <div class="bump" id="bump-box">
+          <div class="bump-top">
+            <div class="bump-checkbox" id="bump-check">☐</div>
+            <div class="bump-label">Adicionar ao pedido — apenas 2.500 Kz</div>
+          </div>
+          <div class="bump-title">🎧 Pack Sono Profundo — Sons e Meditações para Mãe e Bebé</div>
+          <div class="bump-desc">Playlist de sons brancos premium + 3 meditações guiadas para ajudar a mãe a descansar mesmo com interrupções. Criado para acompanhar o método.</div>
+          <div class="bump-price">Apenas +2.500 Kz (valor normal: 5.000 Kz)</div>
+        </div>
+
+        <a href="https://culonga.com/checkout/c5a571e6-1be6-4d9f-a18a-2f567ae23d0a" class="cta-btn">Quero acesso imediato — 7.500 Kz</a>
+        <div class="cta-trust" style="margin-top:12px">
+          <span>🔒 Pagamento seguro</span>
+          <span>⚡ Acesso em segundos</span>
+          <span>💰 Garantia 7 dias</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GARANTIA -->
+  <section>
+    <div class="wrap">
+      <div class="guarantee">
+        <div class="guarantee-icon">🛡️</div>
+        <div>
+          <div class="guarantee-title">Garantia de 7 dias sem risco</div>
+          <p class="guarantee-text">Tens 7 dias para aplicar o método. Se o teu bebé não mostrar melhorias ou se por qualquer razão não ficares satisfeita, devolvemos o dinheiro na totalidade. Sem perguntas, sem complicações. O risco é todo nosso.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FAQ -->
+  <section>
+    <div class="wrap">
+      <p class="sec-label">Dúvidas frequentes</p>
+      <h2 class="sec-title">Perguntas que as mães fazem</h2>
+      <div class="faq">
+        <div class="faq-item">
+          <button class="faq-q">A partir de que idade funciona? <span class="faq-arrow">▾</span></button>
+          <div class="faq-a">O método funciona para bebés a partir dos 2 meses, com secções específicas para 2–4 meses, 4–8 meses e 8–18 meses. Segues a secção da faixa etária do teu bebé.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Tenho de deixar o bebé chorar? <span class="faq-arrow">▾</span></button>
+          <div class="faq-a">Não. O método Vaquinha Sono Tranquilo é 100% gentil. Não usamos técnicas de choro controlado. O objectivo é ensinar o bebé a adormecer com segurança — nunca deixá-lo chorar sozinho.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Quanto tempo demora a ver resultados? <span class="faq-arrow">▾</span></button>
+          <div class="faq-a">A maioria das mães começa a ver melhorias nos primeiros 3 a 7 dias de aplicação consistente. Alguns bebés respondem já na primeira noite. A chave é a consistência.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Funciona se ainda estiver a amamentar? <span class="faq-arrow">▾</span></button>
+          <div class="faq-a">Sim. Não precisas de parar de amamentar. O método ensina-te a separar o momento de mamar do momento de adormecer — para que o bebé não precise do peito como única forma de adormecer.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">Como recebo o acesso depois de pagar? <span class="faq-arrow">▾</span></button>
+          <div class="faq-a">Assim que o pagamento é confirmado, recebes o link de acesso imediatamente. Podes aceder no telemóvel, tablet ou computador. O conteúdo fica disponível para sempre.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <section class="footer-cta">
+    <div class="wrap">
+      <h2>Esta noite pode ser diferente.</h2>
+      <p>Mais de 2.500 mães angolanas já escolheram ter noites tranquilas. A tua vez é agora.</p>
+      <a href="https://culonga.com/checkout/c5a571e6-1be6-4d9f-a18a-2f567ae23d0a" class="cta-btn">Quero começar hoje — 7.500 Kz</a>
+      <div class="cta-trust" style="margin-top:14px; justify-content:center;">
+        <span>🔒 Seguro</span>
+        <span>⚡ Acesso imediato</span>
+        <span>💰 Garantia 7 dias</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY MOBILE -->
+  <div class="sticky">
+    <div class="sticky-inner">
+      <div class="sticky-label">Método completo + bónus — 7.500 Kz</div>
+      <a href="https://culonga.com/checkout/c5a571e6-1be6-4d9f-a18a-2f567ae23d0a" class="cta-btn" style="font-size:15px;padding:14px 20px;">Quero noites tranquilas →</a>
+    </div>
+  </div>
+
+</div><!-- /landing -->
+
+<script>
+// ── STATE ──
+const state = { name: '', age: '', sleep: '', wakes: '' };
+let currentStep = 1;
+const totalSteps = 4;
+
+// ── PROGRESS ──
+function setProgress(step) {
+  document.getElementById('progress').style.width = ((step - 1) / totalSteps * 100) + '%';
+}
+
+// ── SHOW STEP ──
+function showStep(n) {
+  document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('step-' + n);
+  if (el) { el.classList.add('active'); currentStep = n; setProgress(n); }
+}
+
+// ── NAME INPUT ──
+const nameInput = document.getElementById('name-input');
+const btn1 = document.getElementById('btn-1');
+
+nameInput.addEventListener('input', () => {
+  const val = nameInput.value.trim();
+  if (val.length >= 2) { btn1.classList.add('ready'); }
+  else { btn1.classList.remove('ready'); }
+});
+
+nameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && nameInput.value.trim().length >= 2) goNext(1);
+});
+
+btn1.addEventListener('click', () => goNext(1));
+
+// ── OPTION BUTTONS ──
+document.querySelectorAll('.opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const q = opt.dataset.q;
+    document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    document.getElementById('btn-' + q).classList.add('ready');
+  });
+});
+
+// ── NEXT BUTTONS ──
+['btn-2','btn-3','btn-4'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    const n = parseInt(id.split('-')[1]);
+    goNext(n);
+  });
+});
+
+function goNext(step) {
+  if (step === 1) {
+    state.name = nameInput.value.trim();
+  } else if (step === 2) {
+    const sel = document.querySelector('.opt[data-q="2"].selected');
+    if (!sel) return;
+    state.age = sel.dataset.v;
+  } else if (step === 3) {
+    const sel = document.querySelector('.opt[data-q="3"].selected');
+    if (!sel) return;
+    state.sleep = sel.dataset.v;
+  } else if (step === 4) {
+    const sel = document.querySelector('.opt[data-q="4"].selected');
+    if (!sel) return;
+    state.wakes = sel.dataset.v;
+    startAnalysis();
+    return;
+  }
+  showStep(step + 1);
+}
+
+// ── ANALYSIS ──
+function startAnalysis() {
+  setProgress(4);
+  document.getElementById('quiz-shell').style.display = 'none';
+  const screen = document.getElementById('analysis-screen');
+  screen.style.display = 'flex';
+  document.getElementById('analysis-name').textContent = state.name;
+
+  const lines = ['al-1','al-2','al-3'];
+  lines.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      el.classList.add('show');
+      setTimeout(() => el.querySelector('.aline-dot').classList.add('done'), 600);
+    }, i * 900);
+  });
+
+  setTimeout(() => {
+    screen.style.display = 'none';
+    showResult();
+  }, 3600);
+}
+
+// ── RESULT ──
+function showResult() {
+  const screen = document.getElementById('result-screen');
+  screen.style.display = 'flex';
+
+  document.getElementById('result-name-display').textContent = state.name;
+
+  // Personalise result text
+  const ageMap = { '2-4': '2 a 4 meses', '4-8': '4 a 8 meses', '8-18': '8 a 18 meses' };
+  const sleepMap = {
+    'peito': 'adormece a mamar no peito',
+    'colo':  'precisa de ser embalado ao colo',
+    'choro': 'chora muito antes de adormecer',
+    'misto': 'tem uma combinação de padrões de sono'
+  };
+  const wakesMap = {
+    '1-2': 'acorda 1 a 2 vezes por noite',
+    '3-4': 'acorda 3 a 4 vezes por noite',
+    '5+':  'acorda 5 ou mais vezes por noite'
+  };
+
+  const ageTxt   = ageMap[state.age]   || '';
+  const sleepTxt = sleepMap[state.sleep] || '';
+  const wakesTxt = wakesMap[state.wakes] || '';
+
+  const timeMap = { '1-2': '3 a 5 dias', '3-4': '5 a 7 dias', '5+': '7 a 10 dias' };
+  const timeTxt = timeMap[state.wakes] || '5 a 7 dias';
+
+  document.getElementById('result-text').innerHTML =
+    `O teu bebé tem <strong>${ageTxt}</strong>, <strong>${sleepTxt}</strong> e <strong>${wakesTxt}</strong>. `+
+    `Este é um padrão muito comum nesta fase — e tem solução clara. `+
+    `Com o Método Vaquinha Sono Tranquilo, a maioria dos bebés com este perfil começa a mostrar melhorias em <strong>${timeTxt}</strong>.`;
+
+  document.getElementById('btn-see-method').addEventListener('click', showLanding);
+}
+
+// ── LANDING ──
+function showLanding() {
+  document.getElementById('result-screen').style.display = 'none';
+  const landing = document.getElementById('landing');
+  landing.style.display = 'block';
+
+  // Personalise hero
+  const firstName = state.name.split(' ')[0];
+  document.getElementById('lp-name-greeting').textContent =
+    'Olá, ' + firstName + ' — isto foi criado para ti 💙';
+
+  // Personalise headline by age
+  const headlines = {
+    '2-4':  'O teu bebé de 2 a 4 meses ainda acorda a chorar de madrugada? <em>Isso tem solução.</em>',
+    '4-8':  'O teu bebé de 4 a 8 meses ainda não consegue adormecer sozinho? <em>Isso tem solução.</em>',
+    '8-18': 'O teu bebé de 8 a 18 meses ainda acorda várias vezes por noite? <em>Isso tem solução.</em>'
+  };
+  const hl = document.getElementById('lp-headline');
+  if (headlines[state.age]) hl.innerHTML = headlines[state.age];
+
+  window.scrollTo(0, 0);
+}
+
+// ── FAQ ──
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ── BUMP ──
+const bumpCheck = document.getElementById('bump-check');
+if (bumpCheck) {
+  bumpCheck.addEventListener('click', () => {
+    bumpCheck.textContent = bumpCheck.textContent === '☐' ? '☑' : '☐';
+  });
+}
+
+// ── TESTIMONIAL CAROUSEL DOTS ──
+const carousel = document.getElementById('testi-carousel');
+const navWrap = document.getElementById('testi-nav');
+if (carousel && navWrap) {
+  const cards = carousel.querySelectorAll('.testi-card');
+  cards.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'testi-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => {
+      cards[i].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    });
+    navWrap.appendChild(dot);
+  });
+
+  carousel.addEventListener('scroll', () => {
+    const scrollLeft = carousel.scrollLeft;
+    let closest = 0, minDist = Infinity;
+    cards.forEach((card, i) => {
+      const dist = Math.abs(card.offsetLeft - scrollLeft);
+      if (dist < minDist) { minDist = dist; closest = i; }
+    });
+    navWrap.querySelectorAll('.testi-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === closest);
+    });
+  });
+}
+</script>
+</body>
+</html>
